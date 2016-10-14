@@ -100,7 +100,7 @@ class IntArrayBuffer() extends IntTraversable {
   }
 
   protected def ensureSize(size: Int): Unit = {
-    if (actualSize > size) {
+    if (actualSize > buffer.length) {
       return
     }
 
