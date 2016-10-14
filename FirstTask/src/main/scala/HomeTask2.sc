@@ -61,6 +61,7 @@ class IntArrayBuffer() extends IntTraversable {
   def remove(index: Int): Int = {
     val result = apply(index)
     Array.copy(buffer, index + 1, buffer, index, size - index - 1)
+    actualSize -= 1
 
     result
   }
@@ -90,6 +91,7 @@ class IntArrayBuffer() extends IntTraversable {
 
     var i = size
     traversable.foreach(it => {
+      actualSize += 1
       result.buffer.update(i, it)
       i += 1
     })
