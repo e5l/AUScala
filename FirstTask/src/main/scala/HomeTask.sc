@@ -7,10 +7,14 @@ TODO Прочитайте содержимое данного файла.
 В случае неудачи верните сообщение соответствующего исключения.
  */
 
-def readThisWorksheet(): String =
-  Source
+def readThisWorksheet(): String = {
+  val content = Source
     .fromFile("/home/user/Documents/Scala/FirstTask/src/main/scala/HomeTask.sc")
-    .mkString
+  val result = content.mkString
+  content.close()
+
+  result
+}
 
 try {
   println(readThisWorksheet())
