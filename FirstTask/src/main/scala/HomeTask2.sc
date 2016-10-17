@@ -1,3 +1,4 @@
+
 //Реалзуйте IntArrayBuffer с интерфейсом IntTraversable
 trait IntTraversable {
   def isEmpty: Boolean
@@ -22,9 +23,7 @@ trait IntTraversable {
 }
 
 class IntArrayBuffer() extends IntTraversable {
-  private final val DEFAULT_SIZE = 10
-
-  private var buffer = new Array[Int](DEFAULT_SIZE)
+  private var buffer = new Array[Int](0)
   private var actualSize = 0
 
   def apply(index: Int): Int = {
@@ -61,7 +60,6 @@ class IntArrayBuffer() extends IntTraversable {
   def remove(index: Int): Int = {
     val result = apply(index)
     Array.copy(buffer, index + 1, buffer, index, size - index - 1)
-    actualSize -= 1
 
     result
   }
@@ -80,32 +78,26 @@ class IntArrayBuffer() extends IntTraversable {
     result.ensureSize(size - 1)
 
     Array.copy(buffer, 1, result.buffer, 0, size - 1)
+    result.actualSize = size - 1
     result
   }
 
   override def ++(traversable: IntTraversable): IntArrayBuffer = {
     val result = new IntArrayBuffer()
-    result.ensureSize(size + traversable.size)
 
-    Array.copy(buffer, 0, result.buffer, 0, size)
-
-    var i = size
-    traversable.foreach(it => {
-      actualSize += 1
-      result.buffer.update(i, it)
-      i += 1
-    })
+    foreach(result += _)
+    traversable.foreach(result += _)
 
     result
   }
 
   protected def ensureSize(size: Int): Unit = {
-    if (actualSize > buffer.length) {
+    if (actualSize > size) {
       return
     }
 
-    val newBuffer = new Array[Int](size * 2)
-    Array.copy(buffer, 0, newBuffer, 0, actualSize)
+    val newBuffer = new Array[Int](size)
+    Array.copy(buffer, 0, newBuffer, 0, buffer.size)
 
     buffer = newBuffer
   }
@@ -130,6 +122,9 @@ class IntArrayBuffer() extends IntTraversable {
 
   override def flatMap(function: (Int) => IntTraversable): IntTraversable = {
     val mapResult = buffer.map(function)
+    if (mapResult.size == 0) {
+      return IntArrayBuffer()
+    }
 
     var result = mapResult.apply(0)
     for (i <- 1 until buffer.length) {
@@ -144,11 +139,20 @@ class IntArrayBuffer() extends IntTraversable {
   }
 
   private def checkSize(index: Int): Unit = {
-    if (index < size && index > 0) {
+    if (index < size && index >= 0) {
       return
     }
 
     throw new IndexOutOfBoundsException()
+  }
+
+  override def equals(o: scala.Any): Boolean = o match {
+    case x: IntTraversable =>
+      if (x.size == 0 && size == 0) return true
+      if (x.size != size) return false
+
+      head == x.head && tail.equals(x.tail)
+    case _ => false
   }
 }
 
@@ -167,3 +171,5 @@ object IntArrayBuffer {
     else Some(buffer)
   }
 }
+
+IntArrayBuffer(1, 2, 3) ++ IntArrayBuffer(4, 5, 6)
