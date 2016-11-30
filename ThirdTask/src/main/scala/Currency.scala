@@ -4,7 +4,7 @@ import scala.xml.XML
 
 object details {
   def getCurrency(name: String, date: Date): Double = {
-    var request = name
+    var request = "http://www.cbr.ru/scripts/XML_daily.asp"
     if (date != null) {
       request += s"?date_req=${date.day}/${date.month}/${date.year}"
     }
